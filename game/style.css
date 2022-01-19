@@ -1,0 +1,19 @@
+* {
+    padding: 0;
+    margin: 0;
+    }
+    
+canvas {
+    background: #eee;
+    display: block;
+    margin: 0 auto;
+    margin-top: 10px;
+    }
+
+.hp_icon{
+    height:50px;
+}
+
+.hp_bar_text{
+    margin-top: 15px;
+}
