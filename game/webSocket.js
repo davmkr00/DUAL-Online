@@ -1,16 +1,16 @@
 export default class Client {
-    constructor(enemyBullet){
+    constructor(enemyBullet, room){
         
-        this.wbSocket = new WebSocket("ws://127.0.0.1:1222/");  // 45.61.48.66
+        this.wbSocket = new WebSocket(`ws://127.0.0.1:1222/${room}`);
         this.wbSocket.onmessage = (event) => {
-            console.log(enemyBullet)
             enemyBullet.isFire = true;
             enemyBullet.xBulletPosition = Number(event.data);
         };
+        
     }
-    sendBulletPosition(xBulletPosition){
+    sendInfo(info){
         try {
-            this.wbSocket.send(xBulletPosition);
+            this.wbSocket.send(info);
         } catch (error) {
             console.log(error);
         }

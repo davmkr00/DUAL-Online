@@ -3,6 +3,13 @@ import Client from './webSocket.js'
 let canvas = document.getElementById("myCanvas");
 let ctx = canvas.getContext("2d");
 let areaWidth = canvas.width,  areaHeight = canvas.height;
+let url = window.location.href
+const room = url.split('=')[1]
+
+// TODO: replace room extracting from url
+// const url = new URL('location.href');
+// const searchParams3 = new URLSearchParams(url.search);
+// console.log(searchParams3.has('query'))
 
 class Bullet {
     constructor() {
@@ -28,10 +35,11 @@ class Player extends Bullet {
     }
 }
 
-class Actions extends Player {
+class Actions {
     constructor() {
-        super()
+        this.player = new Player()
     }
+    
     static keyDownHandler(e) {
         if(e.code  == "ArrowRight") this.isMoveingRight = true;
         if(e.code == 'ArrowLeft') this.isMoveingLeft = true;
@@ -43,7 +51,7 @@ class Actions extends Player {
         if(e.code == 'ArrowLeft') this.isMoveingLeft = false;
         if(e.code == 'ArrowUp') this.isMoveingUp = false;
         if(e.code == 'ArrowDown') this.isMoveingDown = false;
-        if(e.code == 'Space') player.isFire = true
+        if(e.code == 'Space') this.player.isFire = true
     }
 
     movePlayer() {
@@ -51,32 +59,32 @@ class Actions extends Player {
         if (this.isMoveingLeft) this.moveLeft();
         if (this.isMoveingUp) this.moveUp();
         if (this.isMoveingDown) this.moveDown();
-        if (!player.isFire) this.moveBullet();
+        if (!this.player.isFire) this.moveBullet();
     }
 
     moveRight() {
-        if (player.xPosition >= areaWidth - player.width) return 
-        player.xPosition += player.speed;
+        if (this.player.xPosition >= areaWidth - this.player.width) return 
+        this.player.xPosition += this.player.speed;
     }
     
     moveLeft() {
-        if (player.xPosition <= 0) return 
-        player.xPosition -= player.speed;
+        if (this.player.xPosition <= 0) return 
+        this.player.xPosition -= this.player.speed;
     }
     
     moveUp() {
-        if (player.yPosition <= 0) return 
-        player.yPosition -= player.speed;
+        if (this.player.yPosition <= 0) return 
+        this.player.yPosition -= this.player.speed;
     }
     
     moveDown() {
-        if (player.yPosition >= areaHeight - player.width) return
-        player.yPosition += player.speed;
+        if (this.player.yPosition >= areaHeight - this.player.width) return
+        this.player.yPosition += this.player.speed;
     }
 
     moveBullet() {
-        player.xBulletPosition = player.xPosition + (player.width / 2 - player.bulletWidth / 2);
-        player.yBulletPosition = player.yPosition - player.bulletSpeed;
+        this.player.xBulletPosition = this.player.xPosition + (this.player.width / 2 - this.player.bulletWidth / 2);
+        this.player.yBulletPosition = this.player.yPosition - this.player.bulletSpeed;
     }
 }
 
@@ -85,20 +93,23 @@ class Game extends Actions {
         super()
         this.health = 100
         this.showHealth()
+        this.defultBullet = new Bullet()
+        this.defultPlayer = new Player()
     }
 
     drawPlayer() {
-        Game.update(player.xPosition, player.yPosition, player.width, player.height, "green")
+        Game.update(this.player.xPosition, this.player.yPosition, this.player.width, this.player.height, "green")
     }
     
     drawBullet() {
-        Game.update(player.xBulletPosition, player.yBulletPosition, 
-            player.bulletWidth, player.bulletHeight, "black")
-        player.yBulletPosition -= player.bulletSpeed
-        if (player.yBulletPosition <= 0){
-            wbSocket.sendBulletPosition(player.xBulletPosition)
-            player.isFire = this.isFire
-            player.yBulletPosition = this.yBulletPosition
+        if (!this.player.isFire) return 
+        Game.update(this.player.xBulletPosition, this.player.yBulletPosition, 
+            this.player.bulletWidth, this.player.bulletHeight, "black")
+            this.player.yBulletPosition -= this.player.bulletSpeed
+        if (this.player.yBulletPosition <= 0){
+            wbSocket.sendInfo(this.player.xBulletPosition)
+            this.player.isFire = this.defultPlayer.isFire
+            this.player.yBulletPosition = this.defultPlayer.yBulletPosition
         }
     }
 
@@ -107,26 +118,26 @@ class Game extends Actions {
             enemyBullet.bulletWidth, enemyBullet.bulletWidth, 'black')
         enemyBullet.yBulletPosition += enemyBullet.bulletSpeed;
         if (enemyBullet.yBulletPosition >= areaHeight){
-            enemyBullet.yBulletPosition = 0;  // TODO and in hit bullet
-            enemyBullet.isFire = false;
+            enemyBullet.yBulletPosition = this.defultBullet.yBulletPosition;
+            enemyBullet.isFire = this.defultBullet.isFire;
         }
         this.checkDamage()
     }
 
     checkDamage() {
-        if (enemyBullet.yBulletPosition + enemyBullet.bulletHeight >= player.yPosition) {
-            if ((player.xPosition + player.width >= enemyBullet.xBulletPosition && 
-                    enemyBullet.xBulletPosition >= player.xPosition) || 
-                (player.xPosition + player.width >= enemyBullet.xBulletPosition + enemyBullet.bulletWidth && 
-                    enemyBullet.xBulletPosition + enemyBullet.bulletWidth >= player.xPosition)) {
+        if (enemyBullet.yBulletPosition + enemyBullet.bulletHeight >= this.player.yPosition) {
+            if ((this.player.xPosition + this.player.width >= enemyBullet.xBulletPosition && 
+                    enemyBullet.xBulletPosition >= this.player.xPosition) || 
+                (this.player.xPosition + this.player.width >= enemyBullet.xBulletPosition + enemyBullet.bulletWidth && 
+                    enemyBullet.xBulletPosition + enemyBullet.bulletWidth >= this.player.xPosition)) {
                 this.hitBullet()
             }
         }
     }
-
+    
     hitBullet() {
-        enemyBullet.isFire = false;
-        enemyBullet.yBulletPosition = 0;
+        enemyBullet.isFire = this.defultBullet.isFire;
+        enemyBullet.yBulletPosition = this.defultBullet.yBulletPosition;
         this.health -= 10;
         this.showHealth()
     }
@@ -145,9 +156,8 @@ class Game extends Actions {
 }
 
 let enemyBullet = new Bullet()
-let player = new Player()
 let game = new Game()
-let wbSocket = new Client(enemyBullet)
+let wbSocket = new Client(enemyBullet, room)
 document.addEventListener("keydown", Game.keyDownHandler.bind(game));
 document.addEventListener("keyup", Game.keyUpHandler.bind(game));
 function draw() {
@@ -155,7 +165,7 @@ function draw() {
     game.drawPlayer()
     game.movePlayer()
     if (enemyBullet.isFire) game.drawEnemyBullet()
-    if (player.isFire) game.drawBullet()
+    game.drawBullet()
     requestAnimationFrame(draw)
 }
 
