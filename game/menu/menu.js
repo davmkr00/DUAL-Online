@@ -14,7 +14,10 @@ play.addEventListener('click', () => {
     alert("Please Enter Code To Join")
     return
   }
-  document.location = `../game.html?room=${num}`
+  // document.location = `../game.html?room=${num}`
+  document.location = `../game/${num}`
+
+  
 })
 
 

@@ -1,15 +1,14 @@
 import Client from './webSocket.js'
 
-let canvas = document.getElementById("myCanvas");
-let ctx = canvas.getContext("2d");
-let areaWidth = canvas.width,  areaHeight = canvas.height;
-let url = window.location.href
-const room = url.split('=')[1]
+const canvas = document.getElementById("myCanvas");
+const ctx = canvas.getContext("2d");
+const areaWidth = canvas.width,  areaHeight = canvas.height;
+const url = window.location.href
+const paths = url.split('/')
+const room = paths[paths.length - 2]
 
-// TODO: replace room extracting from url
-// const url = new URL('location.href');
-// const searchParams3 = new URLSearchParams(url.search);
-// console.log(searchParams3.has('query'))
+
+
 
 class Bullet {
     constructor() {
