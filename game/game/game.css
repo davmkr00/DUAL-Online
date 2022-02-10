@@ -11,27 +11,40 @@ body {
     background-attachment: fixed;
     }
       
+.banner {
+    position: absolute;
+    top: 80px;
+    left: 10px;
+}
+
+
 canvas {
     background: #eee;
     display: block;
     margin: 0 auto;
     }
 
-.hp_icon{
+.hp_icon {
     height:50px;
-}
-
-/* .hp_bar_text{
-    margin-top: 50px;
-} */
-img {
     position: absolute;
     top: 10px;
     left: 10px;
 }
+
+
+
 
 h4 {
     position: absolute;
     top: 60px;
     left: 10px;
 }
+
+/* .hp_bar_text{
+    margin-top: 50px;
+} */
+/* img {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+} */
