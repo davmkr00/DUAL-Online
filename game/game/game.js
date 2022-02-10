@@ -142,8 +142,32 @@ class Game extends Actions {
     }
 
     showHealth() {
+        if (this.health <= 0){
+            this.loseGame()
+        }
         document.getElementById("hp").innerHTML = 'Health:' + this.health
     }
+
+    loseGame() {
+        console.log("Game Over")
+        wbSocket.sendInfo("Game Over")
+        alert("You Lose")
+        this.restartGame()
+    }
+
+    winGame() {
+        console.log("Game Over")
+        alert("You Win")
+        this.restartGame()
+    }
+    
+    restartGame() {
+        this.player = new Player()
+        this.health = 100
+        this.showHealth()
+        
+    }
+
 
     static update(xPosition, yPosition, widthSize, heightSize, color) {
         ctx.beginPath();
@@ -156,7 +180,7 @@ class Game extends Actions {
 
 let enemyBullet = new Bullet()
 let game = new Game()
-let wbSocket = new Client(enemyBullet, room)
+let wbSocket = new Client(enemyBullet, room, game.winGame.bind(game))
 document.addEventListener("keydown", Game.keyDownHandler.bind(game));
 document.addEventListener("keyup", Game.keyUpHandler.bind(game));
 function draw() {
